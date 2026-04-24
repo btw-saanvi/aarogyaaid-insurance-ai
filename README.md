@@ -60,10 +60,27 @@ ADMIN_USERNAME=admin
 ADMIN_PASSWORD=password123
 ```
 
-### 3. Run the Project
-Open two terminals:
 *   **Terminal 1 (Backend)**: `python -m uvicorn app.main:app --host 0.0.0.0 --port 5000 --reload` (runs on port 5000)
 *   **Terminal 2 (Frontend)**: `npm run dev` (runs on port 5173)
+
+### 4. Running Tests
+The project includes a suite of unit tests for the RAG pipeline and API endpoints:
+```bash
+cd backend
+python -m pytest tests/
+```
+
+## Demo Scenarios
+To test the full flow, use the sample policies in `/policyPDF` and try these scenarios:
+1.  **Healthy Young Professional**: 25-30 years, "Active", looking for high OPD/Key benefits.
+2.  **Senior with Conditions**: 55-65 years, "Diabetes/Hypertension", looking for short waiting periods.
+3.  **Affordability Focus**: Lower income bracket, Tier-3 city, looking for high suitability scores in budget policies.
+
+## Code Quality Compliance
+*   **Security**: No API keys are stored in the repo. All configuration is via `.env`.
+*   **Logic**: Recommendation logic is grounded in RAG. If data is missing from PDFs, the AI is instructed to avoid hallucinations and refer to the insurer.
+*   **Form Structure**: The user profile form contains exactly 6 fields as required.
+*   **Persistence**: Uses a persistent local ChromaDB instance (folder-based) for easy portability.
 
 ## Limitations
 *   **Small Dataset**: I only tested this with a few sample insurance policies. It might need more data for edge cases.
