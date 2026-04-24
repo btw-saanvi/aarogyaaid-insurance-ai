@@ -18,8 +18,8 @@ class RAGService:
 
     def store_document(self, text: str, metadata: dict):
         """Chunk text and store in ChromaDB with local embeddings."""
-        chunk_size = 500
-        overlap = 100
+        chunk_size = 1000
+        overlap = 200
         chunks = []
         for i in range(0, len(text), chunk_size - overlap):
             chunks.append(text[i:i + chunk_size])
@@ -31,11 +31,12 @@ class RAGService:
             documents=chunks
         )
 
-    def query_documents(self, query: str, k: int = 5):
+    def query_documents(self, query: str, k: int = 5, where: dict = None):
         """Retrieve top k relevant chunks using local semantic search."""
         results = self.collection.query(
             query_texts=[query],
-            n_results=k
+            n_results=k,
+            where=where
         )
         return results['documents'][0] if results['documents'] else []
 

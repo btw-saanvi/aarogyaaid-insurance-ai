@@ -291,32 +291,65 @@ function App() {
               {recommendation ? (
                 <div className="glass-card result-card">
                   <h2 className="section-title"><CheckCircle2 className="text-accent" /> AI Recommended Policies</h2>
-                  <div className="table-container">
+                  <div className="table-container peer-comparison">
+                    <h3>6.1 Peer Comparison Table</h3>
                     <table>
                       <thead>
                         <tr>
-                          <th>Policy</th>
-                          <th>Premium</th>
-                          <th>Benefit</th>
-                          <th>Match Score</th>
+                          <th>Policy Name</th>
+                          <th>Insurer</th>
+                          <th>Premium (Rs/yr)</th>
+                          <th>Cover Amount</th>
+                          <th>Waiting Period</th>
+                          <th>Key Benefit</th>
+                          <th>Suitability Score</th>
                         </tr>
                       </thead>
                       <tbody>
                         {recommendation.comparison_table.map((p, i) => (
                           <tr key={i}>
-                            <td><strong>{p.policy_name}</strong><br/><small>{p.insurer}</small></td>
+                            <td><strong>{p.policy_name}</strong></td>
+                            <td>{p.insurer}</td>
                             <td>{p.premium}</td>
+                            <td>{p.cover_amount}</td>
+                            <td>{p.waiting_period}</td>
                             <td>{p.key_benefit}</td>
-                            <td><div className="score-badge">{p.suitability_score}/10</div></td>
+                            <td><div className="score-badge">{p.suitability_score}%</div></td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
 
+                  <div className="table-container coverage-details">
+                    <h3>6.2 Coverage Detail Table</h3>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Inclusions</th>
+                          <th>Exclusions</th>
+                          <th>Sub-limits</th>
+                          <th>Co-pay %</th>
+                          <th>Claim Type</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>{recommendation.coverage_details.inclusions}</td>
+                          <td>{recommendation.coverage_details.exclusions}</td>
+                          <td>{recommendation.coverage_details.sub_limits}</td>
+                          <td>{recommendation.coverage_details.copay}</td>
+                          <td>{recommendation.coverage_details.claim_type}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
                   <div className="analysis-box">
-                    <h3>Advisor's Justification</h3>
-                    <p>{recommendation.why_this_policy}</p>
+                    <h3>6.3 "Why This Policy" Explanation</h3>
+                    <div className="explanation-content">
+                      <ReactMarkdown>{recommendation.why_this_policy}</ReactMarkdown>
+                    </div>
                   </div>
 
                   <div className="chat-interface glass-inset">

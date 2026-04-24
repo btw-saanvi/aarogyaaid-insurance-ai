@@ -220,6 +220,7 @@ td {
   border-radius: 2rem;
   font-weight: 700;
   display: inline-block;
+  white-space: nowrap;
 }
 
 .delete-btn {
@@ -324,7 +325,50 @@ td {
 
 .analysis-box h3 {
   color: var(--accent);
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.explanation-content {
+  line-height: 1.8;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.explanation-content p {
+  margin-bottom: 1rem;
+}
+
+.explanation-content strong {
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+/* Enhanced Table Typography */
+.peer-comparison th, .coverage-details th {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+}
+
+.peer-comparison td {
+  font-size: 0.875rem;
+}
+
+.coverage-details td {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  max-width: 300px;
+}
+
+.table-container h3 {
+  padding: 1rem;
+  font-size: 0.9rem;
+  background: rgba(15, 23, 42, 0.4);
+  border-bottom: 1px solid var(--glass-border);
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .empty-state {
