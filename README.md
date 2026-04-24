@@ -62,7 +62,7 @@ ADMIN_PASSWORD=password123
 
 ### 3. Run the Project
 Open two terminals:
-*   **Terminal 1 (Backend)**: `python main.py` (runs on port 5000)
+*   **Terminal 1 (Backend)**: `python -m uvicorn app.main:app --host 0.0.0.0 --port 5000 --reload` (runs on port 5000)
 *   **Terminal 2 (Frontend)**: `npm run dev` (runs on port 5173)
 
 ## Limitations
