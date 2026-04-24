@@ -20,12 +20,11 @@ def authenticate(credentials: HTTPBasicCredentials = Depends(security)):
 
 @router.get("/policies")
 async def get_policies(username: str = Depends(authenticate)):
-    """Note: ChromaDB doesn't easily list all raw documents without full search or using the client directly.
-    In a production app, we would query the collection metadata.
-    """
-    # For now, return a placeholder or implement collection.get() if needed
-    # Since the requirement says GET /admin/policies
-    return {"message": "Admin view of policies", "note": "Use collection.get() to list all IDs."}
+    try:
+        policies = rag_service.list_documents()
+        return policies
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/policy/{filename}")
 async def delete_policy(filename: str, username: str = Depends(authenticate)):

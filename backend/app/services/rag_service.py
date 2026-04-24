@@ -47,6 +47,23 @@ class RAGService:
             embedding_function=self.embedding_func
         )
         
+    def list_documents(self):
+        """List all documents in the collection with their metadata."""
+        results = self.collection.get(include=['metadatas', 'documents'])
+        # De-duplicate by filename since one PDF creates multiple chunks
+        seen_files = {}
+        if results['metadatas']:
+            for i, meta in enumerate(results['metadatas']):
+                filename = meta.get('filename')
+                if filename not in seen_files:
+                    seen_files[filename] = {
+                        "filename": filename,
+                        "insurer": meta.get("insurer", "Unknown"),
+                        "policy_name": meta.get("policy_name", "Unknown"),
+                        "upload_date": meta.get("upload_date", "N/A")
+                    }
+        return list(seen_files.values())
+
     def delete_by_filename(self, filename: str):
         """Delete documents matching a specific filename metadata."""
         self.collection.delete(where={"filename": filename})
