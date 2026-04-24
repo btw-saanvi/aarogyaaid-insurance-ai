@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 function App() {
-  const [view, setView] = useState('user'); // 'user', 'admin', 'login'
+  const [view, setView] = useState('landing'); // 'landing', 'user', 'admin', 'login'
   const [formData, setFormData] = useState({
     full_name: '',
     age: '',
@@ -23,7 +23,7 @@ function App() {
   const [chatHistory, setChatHistory] = useState([]);
   const [chatLoading, setChatLoading] = useState(false);
   
-  // Admin state
+  // ... existing admin state ...
   const [adminAuth, setAdminAuth] = useState({ user: '', pass: '' });
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [policies, setPolicies] = useState([]);
@@ -53,8 +53,6 @@ function App() {
 
   const handleAdminLogin = (e) => {
     e.preventDefault();
-    // In a real app, we'd verify with a challenge. 
-    // Here we just set it and let the first API call fail if wrong.
     setIsAuthorized(true);
     setView('admin');
   };
@@ -102,6 +100,7 @@ function App() {
     e.preventDefault();
     setLoading(true);
     setRecommendation(null);
+    setChatHistory([]); // Clear chat history when new recommendation is generated
     try {
       const payload = { ...formData, conditions: formData.conditions.split(',').map(c => c.trim()) };
       const response = await fetch('http://localhost:5000/recommend', {
@@ -148,35 +147,71 @@ function App() {
     <div className="app-container">
       <header className="main-header">
         <div className="header-content">
-          <div className="logo-section" onClick={() => setView('user')} style={{ cursor: 'pointer' }}>
+          <div className="logo-section" onClick={() => setView('landing')} style={{ cursor: 'pointer' }}>
             <Activity className="logo-icon" />
             <div>
               <h1>AarogyaAid AI</h1>
-              <p>Ground-Truth Insurance Intelligence</p>
+              <p>Trusted Insurance Intelligence</p>
             </div>
           </div>
           <nav>
             <button 
+              className={`nav-btn ${view === 'landing' ? 'active' : ''}`} 
+              onClick={() => setView('landing')}
+            >
+              Home
+            </button>
+            <button 
               className={`nav-btn ${view === 'user' ? 'active' : ''}`} 
               onClick={() => setView('user')}
             >
-              <User size={18} /> User Portal
+              <User size={18} /> Get Recommended
             </button>
             <button 
               className={`nav-btn ${view === 'admin' || view === 'login' ? 'active' : ''}`} 
               onClick={() => isAuthorized ? setView('admin') : setView('login')}
             >
-              <Lock size={18} /> Admin Panel
+              <Lock size={18} /> Admin
             </button>
           </nav>
         </div>
       </header>
 
       <main className="main-content">
+        {view === 'landing' && (
+          <section className="landing-page fade-in">
+            <div className="hero">
+              <h2>Smart Health Insurance, <br/>Simplified by AI.</h2>
+              <p>Stop guessing. Get personalized health insurance recommendations backed by ground-truth policy data.</p>
+              <button className="btn-primary cta-btn" onClick={() => setView('user')}>
+                Start Your Free Analysis <ChevronRight size={20} />
+              </button>
+            </div>
+
+            <div className="features">
+              <div className="feature-card">
+                <div className="feature-icon"><Database size={24} /></div>
+                <h3>Ground-Truth Data</h3>
+                <p>We analyze actual policy documents, ensuring your recommendations are based on real coverage details, not generalities.</p>
+              </div>
+              <div className="feature-card">
+                <div className="feature-icon"><Activity size={24} /></div>
+                <h3>AI-Powered Insights</h3>
+                <p>Our advanced AI understands your health profile and lifestyle to find the policy that truly fits your needs.</p>
+              </div>
+              <div className="feature-card">
+                <div className="feature-icon"><ClipboardList size={24} /></div>
+                <h3>Deep Comparison</h3>
+                <p>Get transparent side-by-side comparisons of premiums, benefits, and waiting periods in seconds.</p>
+              </div>
+            </div>
+          </section>
+        )}
+
         {view === 'login' && (
-          <section className="login-screen">
+          <section className="login-screen fade-in">
             <div className="glass-card login-card">
-              <h2><LogIn /> Admin Authentication</h2>
+              <h2><LogIn /> Admin Login</h2>
               <form onSubmit={handleAdminLogin}>
                 <div className="form-group">
                   <label>Username</label>
@@ -186,28 +221,34 @@ function App() {
                   <label>Password</label>
                   <input type="password" value={adminAuth.pass} onChange={e => setAdminAuth({...adminAuth, pass: e.target.value})} />
                 </div>
-                <button type="submit" className="btn-primary">Authenticate</button>
+                <button type="submit" className="btn-primary">Login</button>
               </form>
             </div>
           </section>
         )}
 
         {view === 'admin' && (
-          <div className="admin-dashboard">
-            <section className="glass-card upload-section">
+          <div className="admin-dashboard fade-in">
+            <section className="glass-card upload-section" style={{ marginBottom: '2rem' }}>
               <h2><Upload /> Upload New Policy</h2>
               <form onSubmit={handleFileUpload} className="upload-grid">
-                <input type="file" accept=".pdf" onChange={e => setUploadData({...uploadData, file: e.target.files[0]})} required />
-                <input type="text" placeholder="Insurer (e.g. HDFC Ergo)" value={uploadData.insurer} onChange={e => setUploadData({...uploadData, insurer: e.target.value})} required />
-                <input type="text" placeholder="Policy Name" value={uploadData.policyName} onChange={e => setUploadData({...uploadData, policyName: e.target.value})} required />
+                <div className="form-group" style={{marginBottom: 0}}>
+                  <input type="file" accept=".pdf" onChange={e => setUploadData({...uploadData, file: e.target.files[0]})} required />
+                </div>
+                <div className="form-group" style={{marginBottom: 0}}>
+                  <input type="text" placeholder="Insurer" value={uploadData.insurer} onChange={e => setUploadData({...uploadData, insurer: e.target.value})} required />
+                </div>
+                <div className="form-group" style={{marginBottom: 0}}>
+                  <input type="text" placeholder="Policy Name" value={uploadData.policyName} onChange={e => setUploadData({...uploadData, policyName: e.target.value})} required />
+                </div>
                 <button type="submit" className="btn-primary" disabled={uploadLoading}>
-                  {uploadLoading ? "Uploading..." : "Add to Knowledge Base"}
+                  {uploadLoading ? "Uploading..." : "Add Policy"}
                 </button>
               </form>
             </section>
 
-            <section className="policies-list">
-              <h2><Database /> Knowledge Base Dashboard</h2>
+            <section className="glass-card policies-list">
+              <h2><Database /> Knowledge Base</h2>
               <div className="table-container">
                 <table>
                   <thead>
@@ -243,18 +284,20 @@ function App() {
         )}
 
         {view === 'user' && (
-          <div className="user-view">
-            <section className="glass-card profile-form">
-              <h2 className="section-title"><ClipboardList className="text-secondary" /> User Profile</h2>
+          <div className="user-view fade-in">
+            <section className="glass-card profile-form" style={{ marginBottom: '2rem' }}>
+              <h2 className="section-title" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <ClipboardList className="text-secondary" /> Tell us about yourself
+              </h2>
               <form onSubmit={handleSubmit}>
                 <div className="form-group grid-2">
                   <div>
                     <label><User size={14} /> Full Name</label>
-                    <input type="text" required value={formData.full_name} onChange={e => setFormData({...formData, full_name: e.target.value})} />
+                    <input type="text" placeholder="John Doe" required value={formData.full_name} onChange={e => setFormData({...formData, full_name: e.target.value})} />
                   </div>
                   <div>
                     <label>Age</label>
-                    <input type="number" required value={formData.age} onChange={e => setFormData({...formData, age: e.target.value})} />
+                    <input type="number" placeholder="30" required value={formData.age} onChange={e => setFormData({...formData, age: e.target.value})} />
                   </div>
                 </div>
                 <div className="form-group grid-2">
@@ -273,7 +316,7 @@ function App() {
                 </div>
                 <div className="form-group">
                   <label>Pre-existing Conditions (comma separated)</label>
-                  <input type="text" value={formData.conditions} onChange={e => setFormData({...formData, conditions: e.target.value})} />
+                  <input type="text" placeholder="None, Diabetes, etc." value={formData.conditions} onChange={e => setFormData({...formData, conditions: e.target.value})} />
                 </div>
                 <div className="form-group">
                   <label><Wallet size={14} /> Monthly Income Bracket</label>
@@ -281,7 +324,7 @@ function App() {
                     <option>under 3L</option><option>3-8L</option><option>8-15L</option><option>15L+</option>
                   </select>
                 </div>
-                <button type="submit" className="btn-primary" disabled={loading}>
+                <button type="submit" className="btn-primary" disabled={loading} style={{ marginTop: '1rem' }}>
                   {loading ? <div className="loading-spinner"></div> : <><RefreshCw size={18} /> Generate Recommendation</>}
                 </button>
               </form>
@@ -290,9 +333,12 @@ function App() {
             <section className="recommendation-output">
               {recommendation ? (
                 <div className="glass-card result-card">
-                  <h2 className="section-title"><CheckCircle2 className="text-accent" /> AI Recommended Policies</h2>
-                  <div className="table-container peer-comparison">
-                    <h3>6.1 Peer Comparison Table</h3>
+                  <h2 className="section-title" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <CheckCircle2 className="text-accent" /> Your AI Recommendations
+                  </h2>
+                  
+                  <div className="table-container">
+                    <h3 style={{ padding: '1rem', fontSize: '0.9rem', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>6.1 Peer Comparison Table</h3>
                     <table>
                       <thead>
                         <tr>
@@ -302,7 +348,7 @@ function App() {
                           <th>Cover Amount</th>
                           <th>Waiting Period</th>
                           <th>Key Benefit</th>
-                          <th>Suitability Score</th>
+                          <th>Suitability</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -321,8 +367,8 @@ function App() {
                     </table>
                   </div>
 
-                  <div className="table-container coverage-details">
-                    <h3>6.2 Coverage Detail Table</h3>
+                  <div className="table-container">
+                    <h3 style={{ padding: '1rem', fontSize: '0.9rem', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>6.2 Coverage Detail Table</h3>
                     <table>
                       <thead>
                         <tr>
@@ -352,8 +398,10 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="chat-interface glass-inset">
-                    <h3><Activity size={16} /> Need more clarity? Ask the Chat Explainer</h3>
+                  <div className="chat-interface glass-inset" style={{ marginTop: '2rem' }}>
+                    <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Activity size={16} /> Have questions? Ask our AI
+                    </h3>
                     <div className="chat-history">
                       {chatHistory.map((msg, i) => (
                         <div key={i} className={`chat-bubble ${msg.role}`}>
@@ -367,19 +415,21 @@ function App() {
                         type="text" 
                         value={chatQuestion}
                         onChange={e => setChatQuestion(e.target.value)}
-                        placeholder="Ground-truth data for your specific profile..."
+                        placeholder="Ask about specific coverage details..."
                         onKeyDown={e => e.key === 'Enter' && handleChat()}
                       />
                       <button onClick={handleChat} className="send-btn"><Send size={18} /></button>
                     </div>
-                    <p className="guardrail-note">Note: This AI provides policy comparisons only and does not offer medical advice.</p>
+                    <p className="guardrail-note" style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>
+                      Note: This AI provides policy comparisons based on indexed documents and does not offer medical or financial advice.
+                    </p>
                   </div>
                 </div>
               ) : (
-                <div className="empty-state glass-card">
-                  <ShieldPlus size={64} className="faded-icon" />
-                  <h3>Complete your profile to unlock AI Ground-Truth Recommendations</h3>
-                  <p>Our advisor analyzes indexed policies to find the perfect fit for your lifestyle and health history.</p>
+                <div className="empty-state glass-card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+                  <ShieldPlus size={64} style={{ opacity: 0.1, marginBottom: '1.5rem' }} />
+                  <h3>Your analysis will appear here</h3>
+                  <p style={{ color: 'var(--text-muted)' }}>Complete the profile above to unlock AI-powered health insurance recommendations.</p>
                 </div>
               )}
             </section>
