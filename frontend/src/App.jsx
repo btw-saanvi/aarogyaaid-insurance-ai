@@ -29,6 +29,7 @@ function App() {
   const [policies, setPolicies] = useState([]);
   const [uploadData, setUploadData] = useState({ file: null, insurer: '', policyName: '' });
   const [uploadLoading, setUploadLoading] = useState(false);
+  const [editingPolicy, setEditingPolicy] = useState(null); // Track policy being edited
 
   // Fetch policies when admin view is opened
   useEffect(() => {
@@ -93,6 +94,31 @@ function App() {
       if (response.ok) fetchPolicies();
     } catch (err) {
       alert("Delete failed");
+    }
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`http://localhost:5000/admin/policy/${editingPolicy.filename}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Basic ' + btoa(`${adminAuth.user}:${adminAuth.pass}`) 
+        },
+        body: JSON.stringify({
+          insurer: editingPolicy.insurer,
+          policy_name: editingPolicy.policy_name,
+          upload_date: editingPolicy.upload_date // Keep existing date or update it
+        })
+      });
+      if (response.ok) {
+        setEditingPolicy(null);
+        fetchPolicies();
+        alert("Policy updated!");
+      }
+    } catch (err) {
+      alert("Update failed");
     }
   };
 
@@ -264,13 +290,41 @@ function App() {
                     {policies.length > 0 ? policies.map((p, i) => (
                       <tr key={i}>
                         <td><div className="file-cell"><FileText size={14} /> {p.filename}</div></td>
-                        <td>{p.insurer}</td>
-                        <td>{p.policy_name}</td>
+                        <td>
+                          {editingPolicy && editingPolicy.filename === p.filename ? (
+                            <input 
+                              className="edit-input"
+                              value={editingPolicy.insurer} 
+                              onChange={e => setEditingPolicy({...editingPolicy, insurer: e.target.value})} 
+                            />
+                          ) : p.insurer}
+                        </td>
+                        <td>
+                          {editingPolicy && editingPolicy.filename === p.filename ? (
+                            <input 
+                              className="edit-input"
+                              value={editingPolicy.policy_name} 
+                              onChange={e => setEditingPolicy({...editingPolicy, policy_name: e.target.value})} 
+                            />
+                          ) : p.policy_name}
+                        </td>
                         <td>{p.upload_date}</td>
                         <td>
-                          <button onClick={() => deletePolicy(p.filename)} className="delete-btn">
-                            <Trash2 size={16} />
-                          </button>
+                          {editingPolicy && editingPolicy.filename === p.filename ? (
+                            <div className="edit-actions">
+                              <button onClick={handleUpdate} className="save-btn" title="Save">Save</button>
+                              <button onClick={() => setEditingPolicy(null)} className="cancel-btn" title="Cancel">Cancel</button>
+                            </div>
+                          ) : (
+                            <div className="action-btns">
+                              <button onClick={() => setEditingPolicy({...p})} className="edit-btn" title="Edit Metadata">
+                                <RefreshCw size={16} />
+                              </button>
+                              <button onClick={() => deletePolicy(p.filename)} className="delete-btn" title="Delete">
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          )}
                         </td>
                       </tr>
                     )) : (

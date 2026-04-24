@@ -69,4 +69,21 @@ class RAGService:
         """Delete documents matching a specific filename metadata."""
         self.collection.delete(where={"filename": filename})
 
+    def update_metadata_by_filename(self, filename: str, new_metadata: dict):
+        """Update metadata for all chunks associated with a filename."""
+        # Find all chunks for this file
+        results = self.collection.get(where={"filename": filename})
+        ids = results['ids']
+        if ids:
+            # We must preserve the filename in the metadata for future operations
+            for i in range(len(ids)):
+                # Merging new metadata with the required filename
+                meta = {**new_metadata, "filename": filename}
+                self.collection.update(
+                    ids=[ids[i]],
+                    metadatas=[meta]
+                )
+            return True
+        return False
+
 rag_service = RAGService()

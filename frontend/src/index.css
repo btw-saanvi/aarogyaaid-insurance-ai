@@ -254,6 +254,59 @@ tr:last-child td {
   background: #fee2e2;
 }
 
+.edit-btn {
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.edit-btn:hover {
+  background: #eff6ff;
+}
+
+.action-btns {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.edit-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.save-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: #e2e8f0;
+  color: var(--text-main);
+  border: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.edit-input {
+  padding: 0.4rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--primary-light);
+  width: 100%;
+}
+
 /* Chat */
 .chat-history {
   height: 350px;

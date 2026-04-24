@@ -34,6 +34,17 @@ async def delete_policy(filename: str, username: str = Depends(authenticate)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.put("/policy/{filename}")
+async def update_policy(filename: str, updated_data: dict, username: str = Depends(authenticate)):
+    try:
+        success = rag_service.update_metadata_by_filename(filename, updated_data)
+        if success:
+            return {"status": "success", "message": f"Metadata for {filename} updated"}
+        else:
+            raise HTTPException(status_code=404, detail="Policy not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.delete("/clear-all")
 async def clear_all(username: str = Depends(authenticate)):
     try:
